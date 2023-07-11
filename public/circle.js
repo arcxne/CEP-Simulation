@@ -7,6 +7,11 @@ class Circle {
     this.speedY = speedY;
     this.mass = mass;
     this.colour = colour;
+    this.grabObj = false;
+    this.grabDir = false;
+
+    this.lenX = 0;
+    this.lenY = 0;
   }
 
   updatePosition(e) {
@@ -14,7 +19,7 @@ class Circle {
     this.x += this.speedX;
     this.y += this.speedY;
   }
-  
+
   bounceOffWalls(e1) {
     let e2 = (1 + e1) / 2;
     if (this.x - this.radius < 0) {
@@ -25,7 +30,7 @@ class Circle {
       this.x = width - this.radius - 1;
       this.speedX *= -e2;
     }
-    
+
     if (this.y - this.radius < 0) {
       this.y = this.radius + 1;
       this.speedY *= -e2;
@@ -85,8 +90,53 @@ class Circle {
     return createVector(x1, y1);
   }
 
+  grabChange(_i) {
+    if (grabbing) {
+      let dDir = dist(this.lenX, this.lenY, mouseX, mouseY);
+      if (dDir < grabRadius) {
+        this.grabDir = true;
+        globalGrabDir = true;
+      }
+      if (this.grabDir) {
+        this.lenX = mouseX;
+        this.lenY = mouseY;
+        this.speedX = (this.lenX - this.x) / 15;
+        this.speedY = (this.lenY - this.y) / 15;
+      }
+
+      let dObj = dist(this.x, this.y, mouseX, mouseY);
+      if (dObj < this.radius && !globalGrabDir) {
+        this.grabObj = true;
+      }
+      if (this.grabObj) {
+        this.x = mouseX;
+        this.y = mouseY;
+      }
+    } else {
+      this.grabObj = false;
+      this.grabDir = false;
+    }
+  }
+
+  displayLabels() {
+    this.lenX = this.x + this.speedX * 15;
+    this.lenY = this.y + this.speedY * 15;
+
+    textAlign(CENTER);
+    fill(0);
+    text(round(sqrt(this.speedX**2+this.speedY**2), 2), this.x, this.y + this.radius + 15);
+
+    fill(255, 0, 0, 50);
+    ellipse(this.lenX, this.lenY, grabRadius);
+    
+    strokeWeight(3);
+    stroke(0);
+    line(this.x, this.y, this.lenX, this.lenY);
+  }
+
   draw() {
     fill(this.colour);
+    noStroke();
     ellipse(this.x, this.y, this.radius * 2);
   }
 }

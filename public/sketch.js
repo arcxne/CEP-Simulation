@@ -1,5 +1,13 @@
-let circles = [];
-let coefficientOfRestitution = 0.9; // Elastic collision
+var circles = [];
+var Play = true;
+var coefficientOfRestitution = 0.9; // Elastic collision
+var grabRadius = 40;
+var grabbing = false;
+var globalGrabDir = false;
+
+// gui
+var visible = true;
+var gui, gui2;
 
 function setup() {
   createCanvas(400, 400);
@@ -40,7 +48,10 @@ function setup() {
     )
   );
 
-  noStroke();
+  gui = createGui('Main Control Panel [p]');
+  sliderRange(0.1, 1, 0.01);
+  gui.addGlobals('Play', 'coefficientOfRestitution');
+  gui.setPosition(width + 10, 8);
 }
 
 function draw() {
@@ -48,14 +59,44 @@ function draw() {
 
   // setTimeout(draw, 2000);
 
+  display();
+}
+
+function display() {
+
   for (let i = 0; i < circles.length; i++) {
-    circles[i].updatePosition(coefficientOfRestitution);
     circles[i].draw();
-    for (let j = i + 1; j < circles.length; j++) {
-      if (circles[i].checkCollision(circles[j])) {
-        circles[i].handleCollision(circles[j]);
-        circles[i].adjustPositions(circles[j]);
+    circles[i].displayLabels();
+    if (Play) {
+      circles[i].updatePosition(coefficientOfRestitution);
+      for (let j = i + 1; j < circles.length; j++) {
+        if (circles[i].checkCollision(circles[j])) {
+          circles[i].handleCollision(circles[j]);
+          circles[i].adjustPositions(circles[j]);
+        }
       }
+    } else {
+      circles[i].grabChange(i+1);
     }
   }
+}
+
+// check for keyboard events
+function keyPressed() {
+  switch (key) {
+    // type p to hide / show the GUI
+    case 'p':
+      visible = !visible;
+      if (visible) gui.show(); else gui.hide();
+      break;
+  }
+}
+
+function mousePressed() {
+  grabbing = true;
+}
+
+function mouseReleased() {
+  grabbing = false;
+  globalGrabDir = false;
 }
