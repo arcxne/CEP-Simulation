@@ -21,22 +21,22 @@ class Circle {
   }
 
   bounceOffWalls(e1) {
-    let e2 = (1 + e1) / 2;
-    if (this.x - this.radius < 0) {
-      this.x = this.radius + 1;
+    let e2 = (1 + e1 / 100.0) / 2;
+    if (this.x - this.radius < walls[0]) {
+      this.x = walls[0] + this.radius + 1;
       this.speedX *= -e2;
     }
-    if (this.x + this.radius > width) {
-      this.x = width - this.radius - 1;
+    if (this.x + this.radius > walls[2]) {
+      this.x = walls[2] - this.radius - 1;
       this.speedX *= -e2;
     }
 
-    if (this.y - this.radius < 0) {
-      this.y = this.radius + 1;
+    if (this.y - this.radius < walls[1]) {
+      this.y = walls[1] + this.radius + 1;
       this.speedY *= -e2;
     }
-    if (this.y + this.radius > height) {
-      this.y = height - this.radius - 1;
+    if (this.y + this.radius > walls[3]) {
+      this.y = walls[3] - this.radius - 1;
       this.speedY *= -e2;
     }
   }
@@ -84,13 +84,13 @@ class Circle {
   }
 
   calculateFinalVelocity(v1, v2, m1, m2) {
-    let e = coefficientOfRestitution;
+    let e = Elasticity/100.0;
     let x1 = ((m1 - m2) * v1.x + (1 + e) * m2 * v2.x) / (m1 + m2);
     let y1 = v1.y;
     return createVector(x1, y1);
   }
 
-  grabChange(_i) {
+  grabChange() {
     if (grabbing) {
       let dDir = dist(this.lenX, this.lenY, mouseX, mouseY);
       if (dDir < grabRadius) {
